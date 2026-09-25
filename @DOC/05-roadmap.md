@@ -10,7 +10,7 @@
 - [x] JDK 21 설치 확인 (`java -version`)
 - [ ] Docker Desktop 설치 (Redis 띄우기용)
 - [ ] Postman 또는 curl / httpie 준비
-- [x] 모듈 뼈대 생성 (Spring Boot 4.1.1 + Spring Cloud 2025.1.3, Maven) — 기능 구현 전
+- [x] 모듈 뼈대 생성 (Spring Boot 4.1.1 + Spring Cloud 2025.1.3, Gradle 멀티 프로젝트) — 기능 구현 전
 
 ---
 

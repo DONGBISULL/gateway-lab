@@ -49,4 +49,4 @@ Gateway를 중심으로 서비스를 나눠 보는 Spring 기반 MSA 실습 프�
 
 ## 기술 구성
 
-Java 21, Spring Boot 4.1.1, Spring Cloud Gateway, Spring Authorization Server, Eureka, Redis, Maven을 사용합니다. 이후 Docker Compose, Resilience4j, 분산 추적을 단계적으로 추가합니다.
+Java 21, Spring Boot 4.1.1, Spring Cloud Gateway, Spring Authorization Server, Eureka, Redis, Gradle을 사용합니다. 이후 Docker Compose, Resilience4j, 분산 추적을 단계적으로 추가합니다.
