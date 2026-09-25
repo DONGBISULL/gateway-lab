@@ -1,0 +1,8 @@
+rootProject.name = 'gateway-lab'
+
+include 'discovery'
+include 'gateway'
+include 'auth-server'
+include 'developer-service'
+include 'data-service'
+include 'usage-service'

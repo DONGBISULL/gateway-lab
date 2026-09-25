@@ -1,0 +1,3 @@
+# 셸 스크립트는 LF, 배치 파일은 CRLF 로 고정
+gradlew text eol=lf
+*.bat text eol=crlf
