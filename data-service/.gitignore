@@ -1,0 +1,41 @@
+# 빌드 산출물
+build/
+.gradle/
+out/
+bin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 환경변수 / 비밀값 (.env.example 만 커밋)
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+application-secret*.yml
+application-secret*.properties
+*.pem
+*.key
+*.p12
+*.jks
+
+# 로컬 DB / 로그
+*.mv.db
+*.trace.db
+*.db
+logs/
+*.log
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.sts4-cache/
+
+# OS
+.DS_Store

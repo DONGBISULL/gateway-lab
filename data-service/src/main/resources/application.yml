@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: data-service
+  config:
+    # 실행 위치(data-service/)의 .env 를 읽는다. 파일이 없어도 기동은 된다(optional).
+    import: optional:file:.env[.properties]
+
+server:
+  port: ${SERVER_PORT:8081}   # .env 또는 환경변수에 SERVER_PORT 가 있으면 그 값, 없으면 8081
