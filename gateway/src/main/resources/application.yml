@@ -1,17 +1,53 @@
 spring:
   application:
     name: gateway
+  config:
+    # 실행 위치(gateway/)의 .env 를 읽는다. 파일이 없어도 기동은 된다(optional).
+    import: optional:file:.env[.properties]
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   cloud:
     gateway:
       server:
         webflux:
           routes:
+            # 라우트 식별자
             - id: parkings
               uri: http://localhost:8081
+              # 라우트 적용 조건
               predicates:
                 - Path=/api/v1/parkings/**
+              # 경로 변환
               filters:
                 - RewritePath=/api/v1/parkings(?<segment>/?.*), /parkings${segment}
+                # data-service 장애/지연 시 빠르게 503로 fallback
+                - name: CircuitBreaker
+                  args:
+                    name: parkingsCB
+                    fallbackUri: forward:/fallback/parkings
 
 server:
   port: 8080
+
+app:
+  authentication:
+    # Phase 2-1의 단일 API Key. 실제 client-id는 API Key 검증 결과에서 얻는다.
+    api-key: ${API_KEY}
+  passport:
+    # 내부 서비스에 전파되는 Gateway 발급 Passport 헤더다. 외부 요청의 값은 제거된다.
+    header-name: ${PASSPORT_HEADER_NAME:X-Gateway-Passport}
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 2s
