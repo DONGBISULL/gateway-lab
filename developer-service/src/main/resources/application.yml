@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: developer-service
+
+server:
+  port: 8084
