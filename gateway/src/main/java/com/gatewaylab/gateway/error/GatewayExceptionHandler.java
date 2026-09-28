@@ -1,5 +1,6 @@
 package com.gatewaylab.gateway.error;
 
+import com.gatewaylab.gateway.config.headers.GatewayHeadersProperties;
 import com.gatewaylab.gateway.json.JsonCodec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.webflux.error.ErrorWebExceptionHandler;
@@ -18,8 +19,8 @@ import reactor.core.publisher.Mono;
 @Order(-2)
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
-	private static final String TRACE_ID_HEADER = "X-Trace-Id";
 	private final JsonCodec jsonCodec;
+	private final GatewayHeadersProperties headers;
 
 	@Override
 	public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
@@ -30,7 +31,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 		GatewayErrorCode errorCode = gatewayException.errorCode();
 		GatewayErrorResponse error = GatewayErrorResponse.of(
 				errorCode,
-				exchange.getRequest().getHeaders().getFirst(TRACE_ID_HEADER)
+				exchange.getResponse().getHeaders().getFirst(headers.traceId())
 		);
 		byte[] body = jsonCodec.writeBytes(error);
 

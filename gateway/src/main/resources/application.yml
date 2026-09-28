@@ -35,9 +35,11 @@ app:
   authentication:
     # Phase 2-1의 단일 API Key. 실제 client-id는 API Key 검증 결과에서 얻는다.
     api-key: ${API_KEY}
-  passport:
-    # 내부 서비스에 전파되는 Gateway 발급 Passport 헤더다. 외부 요청의 값은 제거된다.
-    header-name: ${PASSPORT_HEADER_NAME:X-Gateway-Passport}
+  headers:
+    api-key: X-API-Key
+    client-id: X-Client-Id
+    passport: X-Gateway-Passport
+    trace-id: X-Trace-Id
 
 resilience4j:
   circuitbreaker:

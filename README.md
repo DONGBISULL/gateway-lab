@@ -40,12 +40,14 @@ Gateway를 중심으로 서비스를 나눠 보는 Spring 기반 MSA 실습 프�
 
 ## 문서
 
+- [용어와 클래스 이름 규칙](@DOC/00-terminology.md)
 - [API Gateway](@DOC/01-api-gateway.md)
 - [마이크로서비스](@DOC/02-microservices.md)
 - [Open API 인증](@DOC/03-open-api-auth.md)
 - [실습 구조 설계](@DOC/04-lab-architecture.md)
 - [실습 로드맵](@DOC/05-roadmap.md)
 - [실무 설계](@DOC/06-production-design.md)
+- [Request Sanitize](@DOC/07-request-sanitize.md)
 
 ## 기술 구성
 

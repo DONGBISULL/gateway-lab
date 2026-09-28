@@ -1,5 +1,6 @@
 package com.gatewaylab.gateway.filter;
 
+import com.gatewaylab.gateway.config.headers.GatewayHeadersProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -22,7 +23,11 @@ import java.util.UUID;
 @Slf4j
 public class TraceIdFilter implements GlobalFilter, Ordered {
 
-    private static final String TRACE_ID_HEADER = "X-Trace-Id";
+    private final GatewayHeadersProperties headers;
+
+    public TraceIdFilter(GatewayHeadersProperties headers) {
+        this.headers = headers;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -34,15 +39,15 @@ public class TraceIdFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest().mutate()
                 .headers(headers -> {
                     // 같은 이름의 외부 헤더를 제거한 뒤 Gateway가 발급한 값만 downstream에 전달한다.
-                    headers.remove(TRACE_ID_HEADER);
-                    headers.set(TRACE_ID_HEADER, traceId);
+                    headers.remove(this.headers.traceId());
+                    headers.set(this.headers.traceId(), traceId);
                 })
                 .build();
 
         // 오류 응답을 포함해 Gateway가 반환하는 모든 응답에서 추적 ID를 확인할 수 있게 한다.
         exchange.getResponse()
                 .getHeaders()
-                .set(TRACE_ID_HEADER, traceId);
+                .set(headers.traceId(), traceId);
 
         return chain.filter(exchange.mutate()
                         .request(request)

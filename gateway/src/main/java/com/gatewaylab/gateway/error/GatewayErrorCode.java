@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
  */
 public enum GatewayErrorCode {
 
-	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Valid X-API-Key is required."),
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A valid API key is required."),
 	SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "The parking service is temporarily unavailable.");
 
 	private final HttpStatus status;

@@ -1,6 +1,7 @@
 package com.gatewaylab.gateway.filter;
 
 import com.gatewaylab.gateway.authentication.ApiKeyAuthenticator;
+import com.gatewaylab.gateway.config.headers.GatewayHeadersProperties;
 import com.gatewaylab.gateway.error.GatewayErrorCode;
 import com.gatewaylab.gateway.error.GatewayException;
 import com.gatewaylab.gateway.passport.GatewayPassportIssuer;
@@ -18,16 +19,20 @@ import reactor.core.publisher.Mono;
 @Component
 public class ApiKeyAuthenticationFilter implements GlobalFilter, Ordered {
 
-    private static final String API_KEY_HEADER = "X-API-Key";
-
     // 2-1 단계: 키 1개짜리 임시 검증. 값은 .env(API_KEY)에서만 가져온다 — 코드/커밋 대상 설정엔 두지 않는다.
     // 2-3 단계에서 developer-service 조회로 교체한다.
     private final ApiKeyAuthenticator authenticator;
     private final GatewayPassportIssuer passportIssuer;
+    private final GatewayHeadersProperties headers;
 
-    public ApiKeyAuthenticationFilter(ApiKeyAuthenticator authenticator, GatewayPassportIssuer passportIssuer) {
+    public ApiKeyAuthenticationFilter(
+            ApiKeyAuthenticator authenticator,
+            GatewayPassportIssuer passportIssuer,
+            GatewayHeadersProperties headers
+    ) {
         this.authenticator = authenticator;
         this.passportIssuer = passportIssuer;
+        this.headers = headers;
     }
 
     @Override
@@ -36,10 +41,10 @@ public class ApiKeyAuthenticationFilter implements GlobalFilter, Ordered {
         if (isExcluded(exchange)) {
             return chain.filter(exchange);
         }
-
+        // 키 정보 추출
         String apiKey = exchange.getRequest()
                 .getHeaders()
-                .getFirst(API_KEY_HEADER);
+                .getFirst(headers.apiKey());
 
         // 인증 실패는 401, 성공 요청에는 내부 신뢰 헤더를 발급한다.
         return authenticator.authenticate(apiKey)
