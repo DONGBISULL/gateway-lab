@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  # gateway/data-service는 아직 컨테이너가 아니라 호스트에서 ./gradlew bootRun으로 뜬다.
+  # Docker Desktop의 host.docker.internal로 컨테이너 밖(호스트)을 가리킨다.
+  - job_name: gateway
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8080"]
+        labels:
+          service: gateway
+
+  - job_name: data-service
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ["host.docker.internal:8081"]
+        labels:
+          service: data-service

@@ -48,6 +48,7 @@ Gateway를 중심으로 서비스를 나눠 보는 Spring 기반 MSA 실습 프�
 - [실습 로드맵](@DOC/05-roadmap.md)
 - [실무 설계](@DOC/06-production-design.md)
 - [Request Sanitize](@DOC/07-request-sanitize.md)
+- [메트릭·대시보드·알림 TODO](@DOC/09-observability.md)
 
 ## 기술 구성
 
