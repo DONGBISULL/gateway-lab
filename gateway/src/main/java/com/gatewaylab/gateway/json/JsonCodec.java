@@ -1,11 +1,10 @@
 package com.gatewaylab.gateway.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 
 /**
  * Jackson을 이용한 JSON 바이트 변환을 공통으로 제공한다.
@@ -20,7 +19,7 @@ public class JsonCodec {
 	public byte[] writeBytes(Object value) {
 		try {
 			return objectMapper.writeValueAsBytes(value);
-		} catch (JsonProcessingException exception) {
+		} catch (JacksonException exception) {
 			throw new IllegalStateException("Failed to serialize JSON", exception);
 		}
 	}
@@ -28,7 +27,7 @@ public class JsonCodec {
 	public <T> T read(byte[] json, Class<T> type) {
 		try {
 			return objectMapper.readValue(json, type);
-		} catch (IOException exception) {
+		} catch (JacksonException exception) {
 			throw new IllegalArgumentException("Failed to deserialize JSON", exception);
 		}
 	}
