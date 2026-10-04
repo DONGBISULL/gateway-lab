@@ -30,3 +30,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// 루트에서 :data-service:bootRun으로 실행해도 data-service/.env를 읽게 한다.
+tasks.named('bootRun') {
+	workingDir = project.projectDir
+}
