@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.gatewaylab'
 version = '0.0.1-SNAPSHOT'
-description = 'Public Open API - parking data'
+description = 'API usage recording and statistics'
 
 java {
 	toolchain {
@@ -31,7 +31,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// 루트에서 :data-service:bootRun으로 실행해도 data-service/.env를 읽게 한다.
+// 루트에서 :usage-service:bootRun으로 실행해도 usage-service/.env를 읽게 한다.
 tasks.named('bootRun') {
 	workingDir = project.projectDir
 }

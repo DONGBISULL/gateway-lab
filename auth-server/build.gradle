@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.gatewaylab'
 version = '0.0.1-SNAPSHOT'
-description = 'Public Open API - parking data'
+description = 'OAuth2 Authorization Server - token issuer'
 
 java {
 	toolchain {
@@ -21,9 +21,9 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -31,7 +31,7 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// 루트에서 :data-service:bootRun으로 실행해도 data-service/.env를 읽게 한다.
+// 루트에서 :auth-server:bootRun으로 실행해도 auth-server/.env를 읽게 한다.
 tasks.named('bootRun') {
 	workingDir = project.projectDir
 }
