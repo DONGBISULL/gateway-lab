@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-authorization-server-test'
@@ -28,4 +29,9 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 루트에서 :auth-server:bootRun으로 실행해도 auth-server/.env를 읽게 한다.
+tasks.named('bootRun') {
+	workingDir = project.projectDir
 }
