@@ -1,6 +1,14 @@
 spring:
   application:
     name: developer-service
+  config:
+    import: optional:file:.env[.properties]
 
 server:
-  port: 8084
+  port: ${SERVER_PORT:8084}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
