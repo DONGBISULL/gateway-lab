@@ -32,20 +32,34 @@ Gateway를 중심으로 서비스를 나눠 보는 Spring 기반 MSA 실습 프�
 | `GET /api/v1/usage/me` | 내 API 사용량 조회 | `stats.read` scope |
 | `/portal/apps` | 개발자 앱 등록 및 자격 증명 관리 | 포털 로그인 |
 
-> 모든 외부 요청은 Gateway를 거칩니다. 서비스별 책임과 요청 흐름은 [실습 구조 설계](@DOC/04-lab-architecture.md)에 정리했습니다.
+> 모든 외부 요청은 Gateway를 거칩니다. 서비스별 책임과 요청 흐름은 [실습 구조 설계](@DOC/basics/lab-architecture.md)에 정리했습니다.
 
 ## 현재 상태
 
-현재는 작은 단위로 구현·검증·커밋하는 단계입니다. 먼저 Gateway 라우팅과 데이터 서비스를 연결하고, 이후 인증·제한·서비스 간 통신을 추가합니다. 구현 순서와 완료 기준은 [실습 로드맵](@DOC/05-roadmap.md)을 따릅니다.
+현재는 작은 단위로 구현·검증·커밋하는 단계입니다. 먼저 Gateway 라우팅과 데이터 서비스를 연결하고, 이후 인증·제한·서비스 간 통신을 추가합니다. 구현 순서와 완료 기준은 [실습 로드맵](@DOC/roadmap.md)을 따릅니다.
 
 ## 문서
 
-- [API Gateway](@DOC/01-api-gateway.md)
-- [마이크로서비스](@DOC/02-microservices.md)
-- [Open API 인증](@DOC/03-open-api-auth.md)
-- [실습 구조 설계](@DOC/04-lab-architecture.md)
-- [실습 로드맵](@DOC/05-roadmap.md)
-- [실무 설계](@DOC/06-production-design.md)
+`@DOC/`은 [로드맵](@DOC/roadmap.md)의 Phase 순서대로 폴더를 나눴습니다. `basics/`를 먼저 읽고, 이후 진행하는 Phase의 폴더를 읽으면 됩니다.
+
+- [실습 로드맵](@DOC/roadmap.md) — 현재 진행 상황
+- `basics/` (시작 전)
+  - [용어와 클래스 이름 규칙](@DOC/basics/terminology.md)
+  - [API Gateway](@DOC/basics/api-gateway.md)
+  - [실습 구조 설계](@DOC/basics/lab-architecture.md)
+- `phase-2-3-auth/` (인증)
+  - [Open API 인증](@DOC/phase-2-3-auth/open-api-auth.md)
+  - [Request Sanitize](@DOC/phase-2-3-auth/request-sanitize.md)
+- `phase-4-rate-limit/`
+  - [Rate Limit](@DOC/phase-4-rate-limit/rate-limit.md)
+- `phase-5-msa/`
+  - [마이크로서비스](@DOC/phase-5-msa/microservices.md)
+  - [Circuit Breaker](@DOC/phase-5-msa/circuit-breaker.md)
+- `phase-6-operations/`
+  - [메트릭·대시보드·알림 TODO](@DOC/phase-6-operations/observability.md)
+- `phase-8-advanced/` (심화·비교용)
+  - [실무 설계](@DOC/phase-8-advanced/production-design.md)
+  - [종단간 암호화](@DOC/phase-8-advanced/e2e-encryption.md)
 
 ## 기술 구성
 
