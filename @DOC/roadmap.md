@@ -1,4 +1,4 @@
-# 05. 실습 로드맵
+# 실습 로드맵
 
 각 Phase는 **"동작 확인"** 을 통과하면 완료로 본다.
 흐름: **Gateway 기본 → API Key → OAuth2/JWT → 호출량 제한 → MSA로 나누기 → 운영**
@@ -8,8 +8,8 @@
 ## Phase 0. 준비
 
 - [x] JDK 21 설치 확인 (`java -version`)
-- [ ] Docker Desktop 설치 (Redis 띄우기용)
-- [ ] Postman 또는 curl / httpie 준비
+- [x] Docker Desktop 설치 (Redis 띄우기용)
+- [x] Postman 또는 curl / httpie 준비
 - [x] 모듈 뼈대 생성 (Spring Boot 4.1.1 + Spring Cloud 2025.1.3, Gradle 멀티 프로젝트) — 기능 구현 전
 
 ---
@@ -18,9 +18,13 @@
 
 **목표**: Gateway가 요청을 서비스로 넘겨주는 구조 확인
 
-- [ ] `data-service`: `GET /parkings`, `GET /parkings/{id}` (가짜 데이터)
-- [ ] `gateway`: `/api/v1/parkings/**` → `http://localhost:8081` 라우트, 경로 재작성
-- [ ] 공통 에러 응답 형식 정의 (404 등)
+- [x] `data-service`: `GET /parkings`, `GET /parkings/{id}` (가짜 데이터)
+- [x] `gateway`: `/api/v1/parkings/**` → `http://localhost:8081` 라우트, 경로 재작성
+- [ ] 외부 API 표준 오류 응답 계약 정의 및 적용
+  - [ ] Problem Details 형식(`type`, `title`, `status`, `detail`, `instance`, `traceId`) 확정
+  - [ ] `data-service`의 리소스 없음(404)과 입력값 오류에 적용
+  - [ ] Gateway의 인증·라우팅·업스트림 장애 오류에 같은 계약 적용
+  - [ ] 404·401·429·503 응답 테스트 추가
 
 **동작 확인**
 ```bash
@@ -36,9 +40,9 @@ curl localhost:8080/api/v1/parkings/1
 **목표**: 가장 단순한 공개 API 인증을 Gateway 필터로 직접 구현
 
 - [ ] `developer-service` 최소 버전: 앱 등록 → API Key 발급 (DB엔 해시로 저장)
-- [ ] Gateway **커스텀 GlobalFilter**: `X-API-Key` 헤더 검증
-  - [ ] 없음/틀림 → 401 (표준 에러)
-  - [ ] 정상 → `X-Client-Id` 헤더 세팅 (외부에서 온 같은 헤더는 제거)
+- [x] Gateway **커스텀 GlobalFilter**: `X-API-Key` 헤더 검증
+  - [x] 없음/틀림 → 401 (표준 에러)
+  - [x] 정상 → `X-Client-Id` 헤더 세팅 (외부에서 온 같은 헤더는 제거)
 - [ ] 키 조회 결과를 Redis에 캐시 → 매 요청 DB 조회 제거
 - [ ] 키 폐기 시 캐시도 삭제
 
@@ -109,10 +113,10 @@ for i in $(seq 1 20); do curl -s -o /dev/null -w "%{http_code}\n" \
 - [ ] 앱 삭제 시 Redis 블랙리스트 등록 → Gateway에서 즉시 차단
 - [ ] `usage-service` 추가: Gateway가 호출 이벤트를 **비동기**로 전달 (처음엔 Redis Stream 또는 비동기 HTTP, 심화에서 Kafka)
 - [ ] `GET /api/v1/usage/me` 로 내 사용량 조회
-- [ ] Circuit Breaker: data-service 지연 시 fallback 503
+- [ ] Circuit Breaker: data-service 지연 시 fallback 503 (연결 거부 시 503은 테스트로 확인, OPEN 전환·2s 타임아웃·실제 라우트 설정은 미검증)
 - [ ] data-service 인스턴스 2개 띄워 로드밸런싱 확인
 
-**동작 확인** (04-lab-architecture 의 장애 시나리오)
+**동작 확인** (basics/lab-architecture.md 의 장애 시나리오)
 - usage-service 끄고 API 호출 → 정상 응답
 - data-service 끄고 호출 → 503 표준 에러 (타임아웃까지 기다리지 않음)
 - 앱 삭제 직후 기존 토큰으로 호출 → 401
@@ -125,15 +129,40 @@ for i in $(seq 1 20); do curl -s -o /dev/null -w "%{http_code}\n" \
 
 - [ ] 각 서비스 Dockerfile + `docker-compose.yml` 로 전체 기동
 - [ ] Micrometer Tracing + Zipkin: Gateway → data-service 호출을 traceId 하나로 추적
-- [ ] 에러 응답에 traceId 포함
+- [x] 에러 응답에 traceId 포함
 - [ ] 로그에서 토큰/secret 마스킹 확인
 - [ ] OpenAPI(Swagger) 문서를 Gateway에서 모아 보기 (외부 개발자용 API 문서)
+- [ ] GitHub Actions CI: PR/push 시 모듈별 `./gradlew test` (Redis/PostgreSQL 필요한 모듈은 `services:` 컨테이너로)
 
 ---
 
-## Phase 7. 심화 (선택)
+## Phase 7. AWS 배포 아키텍처 (무료 티어 + 보안)
 
-> 실무 구성과의 차이는 [06-production-design.md](06-production-design.md) 참고
+**목표**: 비용 없이(프리티어) AWS에 실제로 배포하면서, 네트워크/권한 설계 중심으로 보안을 공부한다.
+GitHub Actions 쪽 CD는 **장기 자격증명(Access Key)을 아예 안 쓰는 방식**으로만 구성한다.
+
+- [ ] VPC 설계: public subnet에 EC2 1대, 같은 VPC에 RDS — "서브넷/SG로 나누는 이유"를 직접 체감
+- [ ] EC2(프리티어 t2/t3.micro)에 `docker-compose`로 gateway + discovery + auth-server + 각 service + Redis 기동
+- [ ] RDS PostgreSQL(프리티어 db.t3/t4g.micro)로 전환 — EC2에서 컨테이너로 직접 띄우던 Postgres 대체
+- [ ] RDS 보안그룹 인바운드를 **EC2의 보안그룹으로만 한정** (`0.0.0.0/0` 금지) — SG 참조 방식 최소 권한 연습
+- [ ] EC2에 22번 포트(SSH) 자체를 열지 않고 **AWS SSM Session Manager**로 접속
+- [ ] ECR로 이미지 저장소 전환, EC2 인스턴스 프로파일(IAM Role)에 **pull 권한만** 부여
+- [ ] **GitHub OIDC ↔ AWS IAM Role 연동**: IAM에 OIDC Provider 등록 + 이 레포/브랜치로 범위를 좁힌 Trust Policy로 Role 생성
+  - [ ] `aws-actions/configure-aws-credentials`로 그 Role을 assume (GH Secrets에 Access Key 저장 안 함)
+- [ ] 배포 실행도 SSH 없이: assume한 Role 권한으로 **SSM Send Command**를 보내 EC2에서 `docker compose pull && up -d` 실행
+
+**동작 확인**
+- EC2 보안그룹에 22번 인바운드 규칙이 없는 상태에서 SSM으로는 접속되는지 확인
+- GitHub Actions 로그에 AWS Access Key가 출력/저장되지 않는지 확인 (OIDC 임시 자격증명만 사용)
+- RDS 보안그룹에 EC2 SG 이외의 소스를 허용했을 때 실제로 접속이 안 되는지 확인 (반대로 테스트)
+
+**공부**: VPC/Subnet/Security Group vs NACL, IAM Role Trust Policy, OIDC 연동, SSM Session Manager/Send Command, 최소 권한 원칙, 장기 자격증명 vs 임시 자격증명
+
+---
+
+## Phase 8. 심화 (선택)
+
+> 실무 구성과의 차이는 [production-design.md](phase-8-advanced/production-design.md) 참고
 
 - [ ] auth-server 를 **Keycloak** 으로 교체 (Gateway 설정만 바꿔서 동작하는지 확인)
 - [ ] Nginx(LB) + Gateway 2대 이중화, Gateway 1대 꺼도 서비스 유지 확인
@@ -148,6 +177,7 @@ for i in $(seq 1 20); do curl -s -o /dev/null -w "%{http_code}\n" \
 - [ ] 내부 서비스도 JWT 재검증 (Zero Trust) vs 헤더 신뢰 비교
 - [ ] Kong / Nginx 로 같은 구성 해보고 Spring Cloud Gateway와 비교
 - [ ] Kubernetes (kind / minikube) + Ingress
+- [ ] AWS ECS/Fargate 로 EC2 단일 인스턴스 구성을 대체 (Phase 7과 비교)
 
 ---
 
@@ -156,10 +186,11 @@ for i in $(seq 1 20); do curl -s -o /dev/null -w "%{http_code}\n" \
 | Phase | 내용 | 상태 | 완료일 | 메모 |
 |---|---|---|---|---|
 | 0 | 준비 | ⬜ | | |
-| 1 | Gateway 라우팅 | ⬜ | | |
-| 2 | API Key | ⬜ | | |
+| 1 | Gateway 라우팅 | 🔄 | | 라우팅·rewrite 완료, data-service 404는 표준 에러 형식 미적용 |
+| 2 | API Key | 🔄 | | 단일 키 GlobalFilter만 완료, developer-service·해시 저장·Redis 캐시 남음 |
 | 3 | OAuth2 + JWT | ⬜ | | |
 | 4 | Rate Limit / Quota | ⬜ | | |
 | 5 | MSA 분리 | ⬜ | | |
 | 6 | 운영 준비 | ⬜ | | |
-| 7 | 심화 | ⬜ | | |
+| 7 | AWS 배포 아키텍처 | ⬜ | | |
+| 8 | 심화 | ⬜ | | |
